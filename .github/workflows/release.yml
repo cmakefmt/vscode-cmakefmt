@@ -37,6 +37,7 @@ jobs:
 
       - name: Publish to VS Code Marketplace
         run: npx vsce publish --packagePath *.vsix
+        continue-on-error: true
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
