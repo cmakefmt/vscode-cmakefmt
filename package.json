@@ -15,7 +15,7 @@
   "homepage": "https://cmakefmt.dev",
   "icon": "assets/icon.png",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.110.0"
   },
   "categories": [
     "Formatters"
@@ -62,12 +62,12 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "@vscode/vsce": "^3.0.0",
-    "eslint": "^9.0.0",
-    "typescript": "^5.0.0"
+    "@types/node": "^25.5.2",
+    "@types/vscode": "^1.110.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^10.2.0",
+    "typescript": "^6.0.2"
   }
 }
