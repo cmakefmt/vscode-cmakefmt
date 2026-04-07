@@ -13,7 +13,6 @@
     "url": "https://github.com/cmakefmt/vscode-cmakefmt/issues"
   },
   "homepage": "https://cmakefmt.dev",
-  "icon": "assets/icon.png",
   "engines": {
     "vscode": "^1.110.0"
   },
