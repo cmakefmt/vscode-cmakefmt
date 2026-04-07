@@ -1,0 +1,73 @@
+{
+  "name": "vscode-cmakefmt",
+  "displayName": "cmakefmt",
+  "description": "CMake formatter powered by cmakefmt",
+  "version": "0.1.0",
+  "publisher": "cmakefmt",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmakefmt/vscode-cmakefmt"
+  },
+  "bugs": {
+    "url": "https://github.com/cmakefmt/vscode-cmakefmt/issues"
+  },
+  "homepage": "https://cmakefmt.dev",
+  "icon": "assets/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "keywords": [
+    "cmake",
+    "formatter",
+    "format",
+    "cmakefmt"
+  ],
+  "activationEvents": [
+    "onLanguage:cmake"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "cmakefmt",
+      "properties": {
+        "cmakefmt.executablePath": {
+          "type": "string",
+          "default": "cmakefmt",
+          "description": "Path to the cmakefmt executable. Defaults to 'cmakefmt' on PATH."
+        },
+        "cmakefmt.extraArgs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Extra arguments to pass to cmakefmt (e.g. [\"--config\", \"/path/to/.cmakefmt.yaml\"])."
+        },
+        "cmakefmt.onSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Format CMake files automatically on save."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/vsce": "^3.0.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.0.0"
+  }
+}
