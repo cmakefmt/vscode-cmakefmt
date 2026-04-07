@@ -25,11 +25,11 @@ Or download a pre-built binary from [GitHub Releases](https://github.com/cmakefm
 
 ## Settings
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `cmakefmt.executablePath` | `"cmakefmt"` | Path to the `cmakefmt` binary. |
-| `cmakefmt.extraArgs` | `[]` | Extra arguments passed to `cmakefmt` (e.g. `["--config", "/path/to/.cmakefmt.yaml"]`). |
-| `cmakefmt.onSave` | `true` | Format CMake files automatically on save. |
+| Setting                   | Default      | Description                                                                            |
+|---------------------------|--------------|----------------------------------------------------------------------------------------|
+| `cmakefmt.executablePath` | `"cmakefmt"` | Path to the `cmakefmt` binary.                                                         |
+| `cmakefmt.extraArgs`      | `[]`         | Extra arguments passed to `cmakefmt` (e.g. `["--config", "/path/to/.cmakefmt.yaml"]`). |
+| `cmakefmt.onSave`         | `true`       | Format CMake files automatically on save.                                              |
 
 ## Usage
 
