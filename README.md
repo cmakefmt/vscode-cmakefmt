@@ -1,5 +1,9 @@
 # vscode-cmakefmt
 
+[![CI](https://github.com/cmakefmt/vscode-cmakefmt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cmakefmt/vscode-cmakefmt/actions/workflows/ci.yml)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/cmakefmt.vscode-cmakefmt?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=cmakefmt.vscode-cmakefmt)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/cmakefmt.vscode-cmakefmt)](https://marketplace.visualstudio.com/items?itemName=cmakefmt.vscode-cmakefmt)
+
 VS Code extension for [cmakefmt](https://cmakefmt.dev) — a fast, native CMake formatter.
 
 ## Features
