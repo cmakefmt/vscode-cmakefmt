@@ -2,7 +2,7 @@
   "name": "vscode-cmakefmt",
   "displayName": "cmakefmt",
   "description": "CMake formatter powered by cmakefmt",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "cmakefmt",
   "license": "MIT OR Apache-2.0",
   "repository": {
