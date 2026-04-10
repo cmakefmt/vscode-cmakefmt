@@ -27,3 +27,16 @@ npm run compile
 
 Open the repo in VS Code and press `F5` to launch an Extension Development Host
 with the extension loaded.
+
+## Managing Dependencies
+
+CI uses `npm ci`, which requires `package.json` and `package-lock.json` to be
+exactly in sync. After adding, removing, or updating a dependency in
+`package.json`, always run:
+
+```bash
+npm install
+```
+
+This regenerates `package-lock.json`. **Commit both files together** —
+otherwise CI will fail.
