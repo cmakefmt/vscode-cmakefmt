@@ -20,30 +20,38 @@ CMake formatter written in Rust.
   installation
 - **Extra arguments** — pass additional flags such as `--config-file`
 
-## Install cmakefmt
+## Getting started
 
-The extension requires the `cmakefmt` binary on your `PATH`:
+### 1. Install the extension
 
-**Homebrew** (macOS):
+Click **Install** on this page, or search for **cmakefmt** in the
+Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`).
 
-```bash
-brew install cmakefmt/cmakefmt/cmakefmt
-```
+### 2. Install cmakefmt
 
-**Cargo** (any platform):
+The extension requires the `cmakefmt` binary. Install it using one of
+these methods:
 
-```bash
-cargo install cmakefmt-rust
-```
-
-**Pre-built binaries** — download from
-[GitHub Releases](https://github.com/cmakefmt/cmakefmt/releases/latest).
+| Method                   | Command                                                                               |
+|--------------------------|---------------------------------------------------------------------------------------|
+| **Homebrew** (macOS)     | `brew install cmakefmt/cmakefmt/cmakefmt`                                             |
+| **pip** (any platform)   | `pip install cmakefmt`                                                                |
+| **Cargo** (any platform) | `cargo install cmakefmt-rust`                                                         |
+| **Pre-built binaries**   | [Download from GitHub Releases](https://github.com/cmakefmt/cmakefmt/releases/latest) |
 
 Verify the installation:
 
 ```bash
 cmakefmt --version
 ```
+
+### 3. Format a file
+
+Open any `CMakeLists.txt` or `.cmake` file and save — it is formatted
+automatically.
+
+To format without saving, open the Command Palette (`Ctrl+Shift+P` /
+`Cmd+Shift+P`) and run **Format Document**.
 
 ## Settings
 
@@ -57,40 +65,22 @@ cmakefmt --version
 > project config automatically from the file being formatted. Only use
 > `--config-file` if you need to override the default discovery.
 
-## Usage
-
-1. Install the extension from the
-   [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cmakefmt.vscode-cmakefmt)
-2. Open any `CMakeLists.txt` or `.cmake` file
-3. Save the file — it is formatted automatically
-
-To format without saving, open the Command Palette (`Ctrl+Shift+P` /
-`Cmd+Shift+P`) and run **Format Document**.
-
 ### Disable format-on-save
 
-The extension respects VS Code's built-in `editor.formatOnSave` setting
-and also has its own `cmakefmt.onSave` toggle. To disable format-on-save,
-either approach works:
+Set `cmakefmt.onSave` to `false` in your workspace or user settings:
 
-```json
-// .vscode/settings.json — disable for all formatters
-{
-  "editor.formatOnSave": false
-}
-```
-
-```json
-// .vscode/settings.json — disable only cmakefmt's format-on-save
+```jsonc
+// .vscode/settings.json
 {
   "cmakefmt.onSave": false
 }
 ```
 
-To disable format-on-save only for CMake files while keeping it for other
-languages:
+Alternatively, disable VS Code's built-in format-on-save for CMake files
+only (this affects all formatters, not just cmakefmt):
 
-```json
+```jsonc
+// .vscode/settings.json
 {
   "[cmake]": {
     "editor.formatOnSave": false
@@ -100,7 +90,10 @@ languages:
 
 ### Use a specific binary
 
-```json
+If `cmakefmt` is not on your `PATH`, set the full path:
+
+```jsonc
+// .vscode/settings.json
 {
   "cmakefmt.executablePath": "/usr/local/bin/cmakefmt"
 }
@@ -113,10 +106,10 @@ languages:
 verify. If it works in your regular terminal but not in VS Code, set the
 full path in `cmakefmt.executablePath`.
 
-**Formatting does nothing** — check the Output panel (`View > Output`,
-select "cmakefmt" from the dropdown) for error messages. Common causes:
-the file has a parse error, or there is no `.cmakefmt.yaml` and the
-defaults already match your code.
+**Formatting does nothing** — the file may have a syntax error that
+prevents formatting, or there is no `.cmakefmt.yaml` and the defaults
+already match your code. Check for error notifications in the bottom-right
+corner of VS Code after saving.
 
 **Wrong config is used** — run `cmakefmt config path <file>` in a terminal
 to see which config file `cmakefmt` discovers for a given file.
