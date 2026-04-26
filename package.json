@@ -48,7 +48,8 @@
         "cmakefmt.onSave": {
           "type": "boolean",
           "default": true,
-          "description": "Format CMake files automatically on save."
+          "description": "Deprecated. Use VS Code's built-in `editor.formatOnSave` (optionally scoped to `[cmake]`) instead. This setting is no longer read.",
+          "deprecationMessage": "Deprecated: this setting is no longer used. Enable format-on-save via `editor.formatOnSave`, optionally scoped to `[cmake]`."
         }
       }
     }

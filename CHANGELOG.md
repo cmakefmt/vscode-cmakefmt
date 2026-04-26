@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Changed
+
+- Format-on-save is now driven by VS Code's standard `editor.formatOnSave`
+  setting (optionally scoped to `[cmake]`). The custom save listener has
+  been removed so the extension composes correctly with `formatOnSaveMode`,
+  workspace trust, and other editor knobs.
+
+### Deprecated
+
+- `cmakefmt.onSave` is deprecated and no longer read. Configure
+  `editor.formatOnSave` instead. The setting will be removed in a future
+  release.
+
+## 1.0.0
+
 ### Added
 
 - Initial release of `vscode-cmakefmt`

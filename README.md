@@ -9,10 +9,10 @@ CMake formatter written in Rust.
 
 ## Features
 
-- **Format on save** — `CMakeLists.txt` and `.cmake` files are formatted
-  automatically when saved
 - **Format document** — trigger manually via the Command Palette
   (`Format Document`) or your keyboard shortcut
+- **Format on save** — opt in via VS Code's standard
+  `editor.formatOnSave` setting (see below)
 - **Config discovery** — `cmakefmt` automatically finds the nearest
   `.cmakefmt.yaml`, `.cmakefmt.yml`, or `.cmakefmt.toml` by walking up
   the directory tree — no configuration needed in VS Code settings
@@ -47,11 +47,11 @@ cmakefmt --version
 
 ### 3. Format a file
 
-Open any `CMakeLists.txt` or `.cmake` file and save — it is formatted
-automatically.
+Open any `CMakeLists.txt` or `.cmake` file, then open the Command
+Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run **Format Document**.
 
-To format without saving, open the Command Palette (`Ctrl+Shift+P` /
-`Cmd+Shift+P`) and run **Format Document**.
+To format on save, enable VS Code's built-in `editor.formatOnSave`
+(see [Format on save](#format-on-save) below).
 
 ## Settings
 
@@ -59,34 +59,28 @@ To format without saving, open the Command Palette (`Ctrl+Shift+P` /
 |---------------------------|--------------|---------------------------------------------------------------------------------------------|
 | `cmakefmt.executablePath` | `"cmakefmt"` | Path to the `cmakefmt` binary. Only needed if `cmakefmt` is not on your `PATH`.             |
 | `cmakefmt.extraArgs`      | `[]`         | Extra arguments passed to `cmakefmt` (e.g. `["--config-file", "/path/to/.cmakefmt.yaml"]`). |
-| `cmakefmt.onSave`         | `true`       | Format CMake files automatically on save.                                                   |
 
 > **Tip:** You usually don't need `extraArgs`. `cmakefmt` discovers your
 > project config automatically from the file being formatted. Only use
 > `--config-file` if you need to override the default discovery.
 
-### Disable format-on-save
+### Format on save
 
-Set `cmakefmt.onSave` to `false` in your workspace or user settings:
-
-```jsonc
-// .vscode/settings.json
-{
-  "cmakefmt.onSave": false
-}
-```
-
-Alternatively, disable VS Code's built-in format-on-save for CMake files
-only (this affects all formatters, not just cmakefmt):
+Format-on-save uses VS Code's built-in `editor.formatOnSave` setting.
+Enable it globally, or scope it to CMake files:
 
 ```jsonc
 // .vscode/settings.json
 {
   "[cmake]": {
-    "editor.formatOnSave": false
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "cmakefmt.vscode-cmakefmt"
   }
 }
 ```
+
+To disable it for CMake files only without touching the global setting,
+set `editor.formatOnSave` to `false` in the `[cmake]` scope.
 
 ### Use a specific binary
 

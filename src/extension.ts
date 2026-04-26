@@ -57,7 +57,6 @@ function format(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-  // Document formatting provider
   const formatter = vscode.languages.registerDocumentFormattingEditProvider(
     { language: "cmake" },
     {
@@ -74,17 +73,7 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
-  // Format-on-save listener
-  const onSaveListener = vscode.workspace.onWillSaveTextDocument((event) => {
-    if (
-      event.document.languageId === "cmake" &&
-      cfg<boolean>("onSave")
-    ) {
-      event.waitUntil(format(event.document));
-    }
-  });
-
-  context.subscriptions.push(formatter, onSaveListener);
+  context.subscriptions.push(formatter);
 }
 
 export function deactivate(): void {
