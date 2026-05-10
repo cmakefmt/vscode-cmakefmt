@@ -11,27 +11,36 @@ function cfg<T>(key: string): T {
   return vscode.workspace.getConfiguration("cmakefmt").get<T>(key) as T;
 }
 
-// Resolves the cmakefmt executable path using the following priority:
-//   1. cmakefmt.executablePath if set to anything other than the default "cmakefmt"
-//   2. The platform-specific binary bundled in the extension's bin/ directory
+// Maps process.platform + process.arch to the VS Code target name used when
+// naming bundled binaries (e.g. "linux-x64", "darwin-arm64", "win32-x64").
+function platformTarget(): string {
+  const archMap: Partial<Record<string, string>> = { x64: "x64", arm64: "arm64", arm: "armhf" };
+  const arch = archMap[process.arch] ?? "x64";
+  if (process.platform === "darwin") { return `darwin-${arch}`; }
+  if (process.platform === "win32") { return `win32-${arch}`; }
+  return `linux-${arch}`;
+}
+
+// Resolution order:
+//   1. User-configured executablePath (if changed from the default "cmakefmt")
+//   2. Bundled binary shipped with this .vsix (bin/cmakefmt-<target>[.exe])
 //   3. "cmakefmt" on PATH (original behaviour)
-function resolveExecutable(extensionPath: string): string {
-  const configured = cfg<string>("executablePath");
-  if (configured && configured !== "cmakefmt") {
+function resolveBinary(context: vscode.ExtensionContext): string {
+  const configured: string = cfg("executablePath") || "cmakefmt";
+  if (configured !== "cmakefmt") {
     return configured;
   }
   const ext = process.platform === "win32" ? ".exe" : "";
-  const target = `${process.platform}-${process.arch}`;
-  const bundled = path.join(extensionPath, "bin", `cmakefmt-${target}${ext}`);
+  const bundled = path.join(context.extensionPath, "bin", `cmakefmt-${platformTarget()}${ext}`);
   if (fs.existsSync(bundled)) {
     return bundled;
   }
   return "cmakefmt";
 }
 
-function format(document: vscode.TextDocument, extensionPath: string): Promise<vscode.TextEdit[]> {
+function format(document: vscode.TextDocument, context: vscode.ExtensionContext): Promise<vscode.TextEdit[]> {
   return new Promise((resolve, reject) => {
-    const executable = resolveExecutable(extensionPath);
+    const executable: string = resolveBinary(context);
     const extraArgs: string[] = cfg("extraArgs") || [];
     const args = [...extraArgs, "--stdin-path", document.fileName, "-"];
 
@@ -84,7 +93,7 @@ export function activate(context: vscode.ExtensionContext): void {
         document: vscode.TextDocument,
       ): Promise<vscode.TextEdit[]> {
         try {
-          return await format(document, context.extensionPath);
+          return await format(document, context);
         } catch (err) {
           vscode.window.showErrorMessage(String(err));
           return [];

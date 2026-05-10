@@ -29,13 +29,13 @@ Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`).
 
 ### 2. Install cmakefmt
 
-> **Note (TENTATIVE):** Most users do not need to install cmakefmt separately —
+> **[TENTATIVE]** Most users do not need to install `cmakefmt` separately —
 > recent versions of this extension bundle a prebuilt binary for your platform.
-> The methods below are only needed if you're on an unsupported platform or want
-> to use a custom build.
+> The methods below are only needed if you are on an unsupported platform or
+> want to use a custom build.
 
-The extension requires the `cmakefmt` binary. Install it using one of
-these methods:
+The extension requires the `cmakefmt` binary. If a bundled binary is not
+available for your platform, install it using one of these methods:
 
 | Method                   | Command                                                                               |
 |--------------------------|---------------------------------------------------------------------------------------|
@@ -61,7 +61,7 @@ To format on save, enable VS Code's built-in `editor.formatOnSave`
 ## Settings
 
 | Setting                   | Default      | Description                                                                                 |
-|---------------------------|--------------|---------------------------------------------------------------------------------------------|
+|---------------------------|--------------|------------------------------------------------------------------------------------------|
 | `cmakefmt.executablePath` | `"cmakefmt"` | Path to the `cmakefmt` binary. Only needed if `cmakefmt` is not on your `PATH`.             |
 | `cmakefmt.extraArgs`      | `[]`         | Extra arguments passed to `cmakefmt` (e.g. `["--config-file", "/path/to/.cmakefmt.yaml"]`). |
 
