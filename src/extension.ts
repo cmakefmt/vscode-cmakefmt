@@ -3,15 +3,35 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 import * as cp from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 
 function cfg<T>(key: string): T {
   return vscode.workspace.getConfiguration("cmakefmt").get<T>(key) as T;
 }
 
-function format(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
+// Resolves the cmakefmt executable path using the following priority:
+//   1. cmakefmt.executablePath if set to anything other than the default "cmakefmt"
+//   2. The platform-specific binary bundled in the extension's bin/ directory
+//   3. "cmakefmt" on PATH (original behaviour)
+function resolveExecutable(extensionPath: string): string {
+  const configured = cfg<string>("executablePath");
+  if (configured && configured !== "cmakefmt") {
+    return configured;
+  }
+  const ext = process.platform === "win32" ? ".exe" : "";
+  const target = `${process.platform}-${process.arch}`;
+  const bundled = path.join(extensionPath, "bin", `cmakefmt-${target}${ext}`);
+  if (fs.existsSync(bundled)) {
+    return bundled;
+  }
+  return "cmakefmt";
+}
+
+function format(document: vscode.TextDocument, extensionPath: string): Promise<vscode.TextEdit[]> {
   return new Promise((resolve, reject) => {
-    const executable: string = cfg("executablePath") || "cmakefmt";
+    const executable = resolveExecutable(extensionPath);
     const extraArgs: string[] = cfg("extraArgs") || [];
     const args = [...extraArgs, "--stdin-path", document.fileName, "-"];
 
@@ -64,7 +84,7 @@ export function activate(context: vscode.ExtensionContext): void {
         document: vscode.TextDocument,
       ): Promise<vscode.TextEdit[]> {
         try {
-          return await format(document);
+          return await format(document, context.extensionPath);
         } catch (err) {
           vscode.window.showErrorMessage(String(err));
           return [];

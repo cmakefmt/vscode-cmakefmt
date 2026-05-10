@@ -37,7 +37,7 @@
         "cmakefmt.executablePath": {
           "type": "string",
           "default": "cmakefmt",
-          "description": "Path to the cmakefmt executable. Defaults to 'cmakefmt' on PATH."
+          "description": "Path to the cmakefmt executable. Leave at the default (\"cmakefmt\") to use the bundled binary when available, falling back to cmakefmt on PATH. Set to an absolute path to use a specific installation."
         },
         "cmakefmt.extraArgs": {
           "type": "array",

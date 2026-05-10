@@ -29,6 +29,11 @@ Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`).
 
 ### 2. Install cmakefmt
 
+> **Note (TENTATIVE):** Most users do not need to install cmakefmt separately —
+> recent versions of this extension bundle a prebuilt binary for your platform.
+> The methods below are only needed if you're on an unsupported platform or want
+> to use a custom build.
+
 The extension requires the `cmakefmt` binary. Install it using one of
 these methods:
 

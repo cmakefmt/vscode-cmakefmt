@@ -5,9 +5,13 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Bump this to pick up a new cmakefmt release.
+env:
+  CMAKEFMT_VERSION: "1.4.0"
 
 permissions: read-all
 
@@ -16,11 +20,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: release
-    runs-on: ubuntu-latest
+  package:
+    name: package (${{ matrix.vscode_target }})
+    runs-on: ${{ matrix.os }}
     permissions:
-      contents: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # darwin-arm64: aarch64-apple-darwin ✅
+          - vscode_target: darwin-arm64
+            rust_target: aarch64-apple-darwin
+            os: macos-latest
+          # darwin-x64: x86_64-apple-darwin ✅
+          - vscode_target: darwin-x64
+            rust_target: x86_64-apple-darwin
+            os: macos-latest
+          # linux-arm64: aarch64-unknown-linux-gnu ✅
+          - vscode_target: linux-arm64
+            rust_target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          # linux-x64: x86_64-unknown-linux-gnu ✅
+          - vscode_target: linux-x64
+            rust_target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          # win32-x64: x86_64-pc-windows-msvc ✅
+          - vscode_target: win32-x64
+            rust_target: x86_64-pc-windows-msvc
+            os: windows-latest
+          # NOT included (blocked: needs upstream cmakefmt releases):
+          #   win32-arm64  → aarch64-pc-windows-msvc
+          #   linux-armhf  → armv7-unknown-linux-gnueabihf
+          #   alpine-x64   → x86_64-unknown-linux-musl
+          #   alpine-arm64 → aarch64-unknown-linux-musl
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
@@ -32,24 +66,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Package extension
-        run: npm run package
+      # Assumes the .tar.gz archive contains the binary at the archive root
+      # (standard cargo dist convention). Adjust if the upstream layout changes.
+      - name: Download and extract cmakefmt binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p bin
+          url="https://github.com/cmakefmt/cmakefmt/releases/download/v${{ env.CMAKEFMT_VERSION }}/cmakefmt-${{ env.CMAKEFMT_VERSION }}-${{ matrix.rust_target }}.tar.gz"
+          curl -fsSL -o cmakefmt-archive.tar.gz "${url}"
+          tar -xzf cmakefmt-archive.tar.gz cmakefmt
+          chmod +x cmakefmt
+          mv cmakefmt "bin/cmakefmt-${{ matrix.vscode_target }}"
 
-      - name: Publish to VS Code Marketplace
-        run: npx vsce publish --packagePath *.vsix
-        continue-on-error: true
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Download and extract cmakefmt binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path bin | Out-Null
+          $url = "https://github.com/cmakefmt/cmakefmt/releases/download/v${{ env.CMAKEFMT_VERSION }}/cmakefmt-${{ env.CMAKEFMT_VERSION }}-${{ matrix.rust_target }}.zip"
+          Invoke-WebRequest -Uri $url -OutFile cmakefmt-archive.zip
+          Expand-Archive -Path cmakefmt-archive.zip -DestinationPath .
+          Move-Item -Path cmakefmt.exe -Destination "bin\cmakefmt-${{ matrix.vscode_target }}.exe"
 
-      - name: Publish to Open VSX Registry
-        run: npx ovsx publish *.vsix -p "$OVSX_PAT"
-        continue-on-error: true
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+      - name: Package extension (.vsix)
+        run: npx vsce package --target ${{ matrix.vscode_target }} -o "vscode-cmakefmt-${{ matrix.vscode_target }}.vsix"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe  # v2.6.1
+      # Publishing (vsce publish / ovsx publish) is intentionally omitted.
+      # This workflow only produces .vsix artifacts for inspection and testing.
+      # Add publish steps here once code signing (macOS), Open VSX support,
+      # and v2.0.0 versioning are ready.
+      - name: Upload .vsix artifact
+        uses: actions/upload-artifact@v4  # TODO: pin to SHA hash (Dependabot will update)
         with:
-          tag_name: ${{ github.ref_name }}
-          generate_release_notes: true
-          files: '*.vsix'
+          name: vscode-cmakefmt-${{ matrix.vscode_target }}
+          path: vscode-cmakefmt-${{ matrix.vscode_target }}.vsix
+          if-no-files-found: error
