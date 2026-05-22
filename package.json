@@ -37,7 +37,7 @@
         "cmakefmt.executablePath": {
           "type": "string",
           "default": "cmakefmt",
-          "description": "Path to the cmakefmt executable. Defaults to 'cmakefmt' on PATH."
+          "description": "Path to the cmakefmt executable. When left at the default ('cmakefmt'), the extension first looks for a bundled binary shipped with this .vsix, then falls back to 'cmakefmt' on PATH. Set this to an absolute path only if you need to use a custom build."
         },
         "cmakefmt.extraArgs": {
           "type": "array",
