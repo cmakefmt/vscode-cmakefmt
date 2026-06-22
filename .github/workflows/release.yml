@@ -5,22 +5,85 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      cmakefmt_version:
+        description: 'cmakefmt version to bundle (e.g. 1.4.0; overrides CMAKEFMT_VERSION)'
+        required: false
 
 permissions: read-all
+
+# Bump CMAKEFMT_VERSION when a new upstream cmakefmt release ships.
+# All platform jobs read this value so there is exactly one place to update.
+env:
+  CMAKEFMT_VERSION: "1.4.0"
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: release
-    runs-on: ubuntu-latest
+  package:
+    name: package (${{ matrix.vscode_target }})
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # VS Code target    Rust triple                       Archive   Runner
+          - vscode_target: darwin-arm64
+            rust_triple:   aarch64-apple-darwin
+            archive_ext:   tar.gz
+            runner:        macos-latest
+
+          - vscode_target: darwin-x64
+            rust_triple:   x86_64-apple-darwin
+            archive_ext:   tar.gz
+            runner:        macos-latest
+
+          - vscode_target: linux-x64
+            rust_triple:   x86_64-unknown-linux-gnu
+            archive_ext:   tar.gz
+            runner:        ubuntu-latest
+
+          - vscode_target: linux-arm64
+            rust_triple:   aarch64-unknown-linux-gnu
+            archive_ext:   tar.gz
+            runner:        ubuntu-latest
+
+          - vscode_target: alpine-x64
+            rust_triple:   x86_64-unknown-linux-musl
+            archive_ext:   tar.gz
+            runner:        ubuntu-latest
+
+          - vscode_target: win32-x64
+            rust_triple:   x86_64-pc-windows-msvc
+            archive_ext:   zip
+            runner:        windows-latest
+
+          # The targets below have no prebuilt cmakefmt binary yet.
+          # Uncomment each entry once the upstream release includes the triple.
+          #
+          # - vscode_target: win32-arm64
+          #   rust_triple:   aarch64-pc-windows-msvc    # blocked: needs upstream support
+          #   archive_ext:   zip
+          #   runner:        windows-latest
+          #
+          # - vscode_target: linux-armhf
+          #   rust_triple:   armv7-unknown-linux-gnueabihf  # blocked: needs upstream support
+          #   archive_ext:   tar.gz
+          #   runner:        ubuntu-latest
+          #
+          # - vscode_target: alpine-arm64
+          #   rust_triple:   aarch64-unknown-linux-musl  # blocked: needs upstream support
+          #   archive_ext:   tar.gz
+          #   runner:        ubuntu-latest
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
@@ -32,24 +95,61 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Package extension
-        run: npm run package
+      - name: Resolve cmakefmt version
+        id: version
+        shell: bash
+        run: |
+          # Prefer the manual dispatch override; fall back to the pinned env var.
+          INPUT_VER="${{ inputs.cmakefmt_version }}"
+          VER="${INPUT_VER:-$CMAKEFMT_VERSION}"
+          echo "version=${VER}" >> "$GITHUB_OUTPUT"
 
-      - name: Publish to VS Code Marketplace
-        run: npx vsce publish --packagePath *.vsix
-        continue-on-error: true
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Download and extract cmakefmt binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER="${{ steps.version.outputs.version }}"
+          TRIPLE="${{ matrix.rust_triple }}"
+          EXT="${{ matrix.archive_ext }}"
+          ASSET="cmakefmt-${VER}-${TRIPLE}.${EXT}"
+          URL="https://github.com/cmakefmt/cmakefmt/releases/download/v${VER}/${ASSET}"
 
-      - name: Publish to Open VSX Registry
-        run: npx ovsx publish *.vsix -p "$OVSX_PAT"
-        continue-on-error: true
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+          echo "Downloading ${URL}"
+          curl -fSL "${URL}" -o "${ASSET}"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe  # v2.6.1
+          mkdir -p bin _extract
+
+          if [ "${EXT}" = "zip" ]; then
+            unzip "${ASSET}" -d _extract/
+            find _extract -name "cmakefmt.exe" -type f | head -1 | \
+              xargs -I{} cp {} "bin/cmakefmt-${{ matrix.vscode_target }}.exe"
+          else
+            tar -xzf "${ASSET}" -C _extract/
+            find _extract -name "cmakefmt" -not -name "*.d" -type f | head -1 | \
+              xargs -I{} cp {} "bin/cmakefmt-${{ matrix.vscode_target }}"
+            chmod +x "bin/cmakefmt-${{ matrix.vscode_target }}"
+          fi
+
+          rm -rf _extract "${ASSET}"
+
+      - name: Package platform-specific .vsix
+        shell: bash
+        run: |
+          npx vsce package \
+            --target ${{ matrix.vscode_target }} \
+            -o "vscode-cmakefmt-${{ matrix.vscode_target }}.vsix"
+
+      - name: Upload .vsix artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ github.ref_name }}
-          generate_release_notes: true
-          files: '*.vsix'
+          name: vscode-cmakefmt-${{ matrix.vscode_target }}
+          path: vscode-cmakefmt-${{ matrix.vscode_target }}.vsix
+
+  # Publishing is intentionally omitted from this workflow. The jobs above only
+  # produce .vsix files for local inspection and testing.
+  #
+  # Once artifacts are verified and any required code-signing is configured
+  # (macOS notarization, Windows Authenticode), add a follow-up job that:
+  #   - Downloads the artifacts produced by the 'package' matrix
+  #   - Runs: npx vsce publish --packagePath <file>.vsix  (requires VSCE_PAT secret)
+  #   - Runs: npx ovsx publish <file>.vsix -p "$OVSX_PAT" (requires OVSX_PAT secret)
