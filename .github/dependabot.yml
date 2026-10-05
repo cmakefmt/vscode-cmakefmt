@@ -10,6 +10,9 @@ updates:
       interval: weekly
     commit-message:
       prefix: "chore"
+    ignore:
+      # Keep typings aligned with engines.vscode; raise both deliberately.
+      - dependency-name: "@types/vscode"
 
   - package-ecosystem: github-actions
     directory: /
