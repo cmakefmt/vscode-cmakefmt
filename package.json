@@ -75,6 +75,6 @@
     "@vscode/vsce": "^4.0.0",
     "eslint": "^10.2.0",
     "ovsx": "^1.2.0",
-    "typescript": "^6.0.2"
+    "typescript": "^7.0.2"
   }
 }
