@@ -1,5 +1,8 @@
 .github/
 .vscode/
+.claude/
+.codex/
+.agents/
 src/
 node_modules/
 out/**/*.map

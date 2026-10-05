@@ -22,9 +22,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
         with:
           node-version: '24'
           cache: 'npm'
@@ -33,22 +33,22 @@ jobs:
         run: npm ci
 
       - name: Package extension
+        id: package
         run: npm run package
 
       - name: Publish to VS Code Marketplace
-        run: npx vsce publish --packagePath *.vsix
-        continue-on-error: true
+        run: npx vsce publish --packagePath ./*.vsix
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
       - name: Publish to Open VSX Registry
-        run: npx ovsx publish *.vsix -p "$OVSX_PAT"
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.package.outcome == 'success' }}
+        run: npx ovsx publish ./*.vsix -p "$OVSX_PAT"
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe  # v2.6.1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64  # v3.0.3
         with:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
