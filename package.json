@@ -2,7 +2,7 @@
   "name": "vscode-cmakefmt",
   "displayName": "cmakefmt",
   "description": "CMake formatter powered by cmakefmt",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "publisher": "cmakefmt",
   "license": "MIT OR Apache-2.0",
   "repository": {
@@ -41,7 +41,9 @@
         },
         "cmakefmt.extraArgs": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Extra arguments to pass to cmakefmt (e.g. [\"--config\", \"/path/to/.cmakefmt.yaml\"])."
         },
