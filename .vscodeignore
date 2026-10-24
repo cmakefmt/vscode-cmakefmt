@@ -4,6 +4,7 @@
 .codex/
 .agents/
 src/
+scripts/
 node_modules/
 out/**/*.map
 *.vsix

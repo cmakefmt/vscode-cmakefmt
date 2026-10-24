@@ -4,11 +4,17 @@
 
 ### Fixed
 
+- Use patched MSAL authentication dependencies in publishing tools and verify
+  Azure Identity compatibility with an offline token acquisition/cache test.
+
 - Exclude local agent settings from packaged extensions.
 - Report registry publishing failures instead of silently marking releases
   successful. Open VSX publication is still attempted if Marketplace fails.
 
 ### Changed
+
+- Update ESLint, TypeScript ESLint, Node typings, Open VSX publishing tools,
+  and the pinned Node setup action.
 
 - Refresh development and publishing dependencies. Pin VS Code API typings
   to the supported minimum editor version, 1.110.0.

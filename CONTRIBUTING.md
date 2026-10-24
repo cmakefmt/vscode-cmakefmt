@@ -40,3 +40,11 @@ npm install
 
 This regenerates `package-lock.json`. **Commit both files together** —
 otherwise CI will fail.
+
+The scoped `@azure/identity` override selects MSAL Node 7.1.1 or later to
+address [GHSA-xcx6-jx8p-x3h5](https://github.com/advisories/GHSA-xcx6-jx8p-x3h5).
+Azure Identity 4.14 still requests the affected MSAL 6.x major. Remove the
+override once Azure Identity requests a patched version itself. Run
+`npm run test:publishing-auth` when changing these dependencies; it checks
+token acquisition and caching with a fake HTTP transport and no credentials
+or external requests.

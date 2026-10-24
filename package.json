@@ -62,21 +62,25 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
     "package": "vsce package",
-    "publish": "vsce publish"
+    "publish": "vsce publish",
+    "test:publishing-auth": "node --test scripts/test-publishing-auth.cjs"
   },
   "overrides": {
     "ovsx": {
       "@vscode/vsce": "$@vscode/vsce"
+    },
+    "@azure/identity": {
+      "@azure/msal-node": "^7.1.1"
     }
   },
   "devDependencies": {
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "@types/vscode": "1.110.0",
-    "@typescript-eslint/eslint-plugin": "^8.58.2",
-    "@typescript-eslint/parser": "^8.58.2",
+    "@typescript-eslint/eslint-plugin": "^8.71.2",
+    "@typescript-eslint/parser": "^8.71.2",
     "@vscode/vsce": "^4.0.0",
-    "eslint": "^10.2.0",
-    "ovsx": "^1.2.0",
+    "eslint": "^10.13.0",
+    "ovsx": "^1.3.0",
     "typescript": "^6.0.2"
   }
 }
